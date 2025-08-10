@@ -3,28 +3,25 @@
 GITFS_VERSION := 0.5.2
 
 DEPENDENCIES := libgit2 python-pex
-PYTHON_PEX_VERSION := 1.6.12
-LIBGIT2_VERSION := 0.28.3
+PYTHON_PEX_VERSION := 2.50.2
+# Align with pygit2 >=1.17 which upgrades to libgit2 1.9
+LIBGIT2_VERSION := 1.9.0
 
-PACKAGES := atomiclong cffi fusepy pycparser pygit2 raven six contextlib2
+PACKAGES := atomiclong cffi mfusepy pycparser pygit2 sentry-sdk
 ATOMICLONG_VERSION := 0.1.1
-CFFI_VERSION := 1.12.3
-FUSEPY_VERSION := 3.0.1
-PYCPARSER_VERSION := 2.19
-PYGIT2_VERSION := 0.28.2
-RAVEN_VERSION := 6.10.0
-SIX_VERSION := 1.12.0
-CONTEXTLIB2_VERSION := 0.5.4
+CFFI_VERSION := 1.17.1
+MFUSEPY_VERSION := 1.1.0
+PYCPARSER_VERSION := 2.22
+PYGIT2_VERSION := 1.18.0
+SENTRY_SDK_VERSION := 2.30.0
 
 GITFS_URL := https://github.com/Presslabs/gitfs/archive/$(GITFS_VERSION).tar.gz
 LIBGIT2_URL := https://github.com/libgit2/libgit2/archive/v$(LIBGIT2_VERSION).tar.gz
 PYTHON_PEX_URL := https://github.com/pantsbuild/pex/archive/v$(PYTHON_PEX_VERSION).tar.gz
 
 ATOMICLONG_URL := https://pypi.python.org/packages/source/a/atomiclong/atomiclong-$(ATOMICLONG_VERSION).tar.gz
-CFFI_URL := https://files.pythonhosted.org/packages/93/1a/ab8c62b5838722f29f3daffcc8d4bd61844aa9b5f437341cc890ceee483b/cffi-$(CFFI_VERSION).tar.gz
-FUSEPY_URL := https://files.pythonhosted.org/packages/04/0b/4506cb2e831cea4b0214d3625430e921faaa05a7fb520458c75a2dbd2152/fusepy-$(FUSEPY_VERSION).tar.gz
-PYCPARSER_URL := https://github.com/eliben/pycparser/archive/release_v$(PYCPARSER_VERSION).tar.gz
-PYGIT2_URL := https://github.com/libgit2/pygit2/archive/v$(PYGIT2_VERSION).tar.gz
-RAVEN_URL := https://github.com/getsentry/raven-python/archive/$(RAVEN_VERSION).tar.gz
-SIX_URL := https://files.pythonhosted.org/packages/dd/bf/4138e7bfb757de47d1f4b6994648ec67a51efe58fa907c1e11e350cddfca/six-$(SIX_VERSION).tar.gz
-CONTEXTLIB2_URL := https://pypi.python.org/packages/cc/19/0bee3b2ea499f7fb2480b6b3f4ae7951e111d6b73785ba53c6afeba55672/contextlib2-$(CONTEXTLIB2_VERSION).tar.gz#md5=2d66215f9902c8b857688d4e3b527b3f
+CFFI_URL := https://files.pythonhosted.org/packages/fc/97/c783634659c2920c3fc70419e3af40972dbaf758daa229a7d6ea6135c90d/cffi-$(CFFI_VERSION).tar.gz
+MFUSEPY_URL := https://files.pythonhosted.org/packages/8b/37/b29c414d76e8d709b6e28b1ee18e6d4c6a605abca79c86e549aab9a6eea9/mfusepy-$(MFUSEPY_VERSION).tar.gz
+PYCPARSER_URL := https://files.pythonhosted.org/packages/1d/b2/31537cf4b1ca988837256c910a668b553fceb8f069bedc4b1c826024b52c/pycparser-$(PYCPARSER_VERSION).tar.gz
+PYGIT2_URL := https://github.com/libgit2/pygit2/archive/refs/tags/v$(PYGIT2_VERSION).tar.gz
+SENTRY_SDK_URL := https://files.pythonhosted.org/packages/04/4c/af31e0201b48469786ddeb1bf6fd3dfa3a291cc613a0fe6a60163a7535f9/sentry_sdk-$(SENTRY_SDK_VERSION).tar.gz
