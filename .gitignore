@@ -1,1 +1,47 @@
 build/
+target/
+*.deb
+*.changes
+*.dsc
+*.tar.gz
+*.tar.xz
+*.buildinfo
+*.upload
+*.orig.tar.*
+*.debian.tar.*
+.pbuilder*
+.sbuild*
+
+# GPG/Security files - NEVER commit these
+*.key
+*.gpg
+*.asc
+private.key
+private-key*
+secret*
+*.pem
+*.p12
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.env
+
+# Act (GitHub Actions local runner)
+.actrc
+
+# OS files
+.DS_Store
+Thumbs.db
