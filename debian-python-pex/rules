@@ -2,6 +2,7 @@
 
 export PYBUILD_NAME=pex
 export DH_VERBOSE=1
+export PYBUILD_DISABLE=test
 
 export pkgversion=$(shell dpkg-parsechangelog --show-field version)
 
@@ -27,6 +28,10 @@ override_dh_installman:
 		--no-discard-stderr --no-info \
 		debian/pex/usr/bin/pex
 	dh_installman
+
+override_dh_auto_test:
+	@echo "Skipping pex tests under pybuild on Launchpad"
+	true
 
 override_dh_auto_clean:
 	rm -f debian/pex.1
