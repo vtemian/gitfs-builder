@@ -75,10 +75,10 @@ build-%:
 		&& dpkg-buildpackage -d -S -sa -us -uc \
 		&& if gpg --list-secret-keys vladtemian@gmail.com >/dev/null 2>&1; then \
 			echo "Signing package with GPG..." && \
-			export GNUPGHOME=~/.gnupg && \
-			export GPG_TTY="" && \
 			cd .. && \
-			echo "" | GNUPGHOME=~/.gnupg debsign --no-re-sign -k vladtemian@gmail.com $*_$($(shell echo $* | tr a-z- A-Z_)_VERSION)-$(BUILD_VERSION)_source.changes; \
+			export GNUPGHOME=~/.gnupg && \
+			export DEBSIGN_PROGRAM="$(CURDIR)/gpg-batch-wrapper.sh" && \
+			debsign --no-re-sign -k vladtemian@gmail.com $*_$($(shell echo $* | tr a-z- A-Z_)_VERSION)-$(BUILD_VERSION)_source.changes; \
 		else \
 			echo "Skipping GPG signing (no key available)"; \
 		fi
