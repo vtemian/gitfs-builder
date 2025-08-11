@@ -19,7 +19,7 @@ override_dh_auto_install:
 	rm -rf debian/python-pex/usr/bin
 
 override_dh_installdocs:
-	PYTHONPATH=. sphinx-build -N -bhtml docs build
+	@echo "Skipping sphinx docs build; installing no docs"
 	dh_installdocs
 
 override_dh_installman:
