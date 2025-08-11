@@ -34,10 +34,22 @@ jobs:
       env:
         PGP_KEY: ${{ secrets.PGP_KEY }}
       run: |
-        # Configure GPG for non-interactive mode
-        export GPG_TTY=$(tty) || true
-        echo "allow-loopback-pinentry" >> ~/.gnupg/gpg-agent.conf
-        echo "pinentry-mode loopback" >> ~/.gnupg/gpg.conf
+        # Create GPG directories and configure for non-interactive mode
+        mkdir -p ~/.gnupg
+        chmod 700 ~/.gnupg
+        
+        # Configure GPG and gpg-agent for CI
+        cat > ~/.gnupg/gpg.conf << EOF
+        use-agent
+        pinentry-mode loopback
+        allow-freeform-uid
+        EOF
+        
+        cat > ~/.gnupg/gpg-agent.conf << EOF
+        allow-loopback-pinentry
+        EOF
+        
+        # Restart gpg-agent with new config
         gpgconf --kill gpg-agent
         gpgconf --launch gpg-agent
         
@@ -45,7 +57,8 @@ jobs:
         echo "$PGP_KEY" | gpg --batch --import
         
         # Trust the key
-        gpg --list-keys --fingerprint --with-colons vladtemian@gmail.com | sed -E -n -s 's/^fpr:::::::::([0-9A-F]+):$/\1:6:/p' | gpg --import-ownertrust
+        KEY_ID=$(gpg --list-keys --with-colons vladtemian@gmail.com | awk -F: '/^pub:/ { print $5 }')
+        echo "$KEY_ID:6:" | gpg --import-ownertrust
     
     - name: Build packages
       env:
@@ -59,9 +72,6 @@ jobs:
         GITHUB_REF_NAME: ${{ github.ref_name }}
         GNUPGHOME: /home/runner/.gnupg
       run: |
-        # Configure GPG for signing
-        echo "pinentry-mode loopback" >> ~/.gnupg/gpg.conf
-        
         make clean
         make build
     
