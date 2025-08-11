@@ -32,7 +32,7 @@ jobs:
     - name: Import PGP key
       env:
         PGP_KEY: ${{ secrets.PGP_KEY }}
-        GPG_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}
+        GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
       run: |
         if [ -z "${PGP_KEY:-}" ]; then
           echo "No PGP_KEY provided; skipping GPG import."
@@ -75,7 +75,7 @@ jobs:
         GITHUB_RUN_NUMBER: ${{ github.run_number }}
         GITHUB_REF_NAME: ${{ github.ref_name }}
         GNUPGHOME: /home/runner/.gnupg
-        GPG_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}
+        GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
       run: |
         make clean
         make build
