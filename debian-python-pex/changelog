@@ -2,7 +2,7 @@ python-pex (1.6.12-2ubuntu1) bionic; urgency=medium
 
   * New upstream version 1.6.12
 
- -- Vlad Temian <vlad@presslabs.com>  Wed, 23 Oct 2019 15:08:46 +0000
+ -- Vlad Temian <vladtemian@gmail.com>  Wed, 23 Oct 2019 15:08:46 +0000
 
 python-pex (1.1.14-2ubuntu2) artful; urgency=medium
 

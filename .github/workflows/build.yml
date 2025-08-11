@@ -1,0 +1,57 @@
+name: Build Packages
+
+on:
+  push:
+    branches: [ master ]
+    tags: [ 'v*' ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        series: [bionic, focal, jammy]
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Set up build environment
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y devscripts build-essential lintian dput-ng python3.11-dev
+    
+    - name: Import PGP key
+      run: |
+        echo "${{ secrets.PGP_KEY }}" | gpg --import
+        gpg --list-keys --fingerprint --with-colons vladtemian@gmail.com | sed -E -n -s 's/^fpr:::::::::([0-9A-F]+):$/\1:6:/p' | gpg --import-ownertrust
+    
+    - name: Build packages
+      env:
+        DEBEMAIL: "vladtemian@gmail.com"
+        DEBFULLNAME: "Vlad Temian"
+        SERIES: ${{ matrix.series }}
+        GITHUB_ACTIONS: true
+        GITHUB_REF: ${{ github.ref }}
+        GITHUB_RUN_NUMBER: ${{ github.run_number }}
+        GITHUB_REF_NAME: ${{ github.ref_name }}
+      run: |
+        make clean
+        make build
+    
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: packages-${{ matrix.series }}
+        path: build/
+    
+    - name: Deploy to PPA (master branch)
+      if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+      run: |
+        cd build && dput ppa:vladtemian/gitfs *.changes

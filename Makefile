@@ -1,28 +1,28 @@
 include VERSIONS
 
-# We check for $CI_BUILD_DIR env variable to set the target accordingly if we
+# We check for GitHub Actions environment to set the target accordingly if we
 # are within a CI environment
-ifdef DRONE
-	TARGET ?= /drone/gitfs/build
+ifdef GITHUB_ACTIONS
+	TARGET ?= /github/workspace/build
 else
 	TARGET ?= /target/build
 endif
 
-ifdef DRONE_COMMIT_REF
-	COMMIT ?= $(DRONE_COMMIT_REF)
+ifdef GITHUB_REF
+	COMMIT ?= $(GITHUB_REF)
 else
 	COMMIT ?= '(none)'
 endif
 
 BUILD_DIST := $(shell lsb_release -sc)
-ifdef DRONE_TAG
-	BUILD_VERSION ?= ~ppa$(DRONE_TAG:v%=%)
+ifdef GITHUB_REF_TYPE
+ifeq ($(GITHUB_REF_TYPE),tag)
+	BUILD_VERSION ?= ~ppa$(GITHUB_REF_NAME:v%=%)
 else
-ifdef DRONE_BRANCH
-	BUILD_VERSION ?= ~ppa$(DRONE_BUILD_NUMBER)+$(DRONE_BRANCH)
+	BUILD_VERSION ?= ~ppa$(GITHUB_RUN_NUMBER)+$(GITHUB_REF_NAME)
+endif
 else
 	BUILD_VERSION ?= $(shell date +'~ppa%Y%m%d+%H%M%S')
-endif
 endif
 
 BUILD_VERSION := $(BUILD_DIST)$(BUILD_VERSION)
