@@ -17,23 +17,6 @@ Standards-Version: 3.9.8
 Vcs-Git: https://anonscm.debian.org/git/python-modules/packages/python-pex.git
 Vcs-Browser: https://anonscm.debian.org/cgit/python-modules/packages/python-pex.git
 
-Package: python-pex
-Architecture: all
-Depends: ${misc:Depends}, ${python:Depends}
-Suggests: python-pex-doc
-Description: library for generating Python executable zip files
- pex is a library for generating .pex (Python EXecutable) files which
- are executable Python environments in the spirit of virtualenvs.  pex
- is an expansion upon the ideas outlined in PEP 441 and makes the
- deployment of Python applications as simple as cp.  pex files may even
- include multiple platform-specific Python distributions, meaning that
- a single pex file can be portable across Linux and OS X.
- .
- pex files can be built using the pex tool.  Build systems such as
- Pants and Buck also support building .pex files directly.
- .
- This is the Python 2 library version.
-
 Package: python3-pex
 Architecture: all
 Depends: ${misc:Depends}, ${python3:Depends}
