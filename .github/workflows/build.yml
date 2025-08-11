@@ -25,11 +25,16 @@ jobs:
     - name: Set up build environment
       run: |
         sudo apt-get update
-        sudo apt-get install -y devscripts build-essential lintian dput-ng python3.11-dev
+        sudo apt-get install -y devscripts build-essential lintian dput-ng python3.11-dev \
+          debhelper cmake pkg-config libz-dev libmbedtls-dev libssh2-1-dev \
+          libhttp-parser-dev libkrb5-dev python-is-python3
     
     - name: Import PGP key
+      if: ${{ env.PGP_KEY != '' }}
+      env:
+        PGP_KEY: ${{ secrets.PGP_KEY }}
       run: |
-        echo "${{ secrets.PGP_KEY }}" | gpg --import
+        echo "$PGP_KEY" | gpg --import
         gpg --list-keys --fingerprint --with-colons vladtemian@gmail.com | sed -E -n -s 's/^fpr:::::::::([0-9A-F]+):$/\1:6:/p' | gpg --import-ownertrust
     
     - name: Build packages
@@ -39,6 +44,7 @@ jobs:
         SERIES: ${{ matrix.series }}
         GITHUB_ACTIONS: true
         GITHUB_REF: ${{ github.ref }}
+        GITHUB_REF_TYPE: ${{ github.ref_type }}
         GITHUB_RUN_NUMBER: ${{ github.run_number }}
         GITHUB_REF_NAME: ${{ github.ref_name }}
       run: |
@@ -52,6 +58,8 @@ jobs:
         path: build/
     
     - name: Deploy to PPA (master branch)
-      if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+      if: github.ref == 'refs/heads/master' && github.event_name == 'push' && env.PGP_KEY != ''
+      env:
+        PGP_KEY: ${{ secrets.PGP_KEY }}
       run: |
         cd build && dput ppa:vladtemian/gitfs *.changes
