@@ -61,7 +61,9 @@ get-python-pex:
 	mv $(BUILD_DIR)/pex-$(PYTHON_PEX_VERSION) $(BUILD_DIR)/python-pex-$(PYTHON_PEX_VERSION)
 
 get-%:
-	wget -q $($(shell echo $* | tr a-z- A-Z_)_URL) -O $(BUILD_DIR)/$*_$($(shell echo $* | tr a-z- A-Z_)_VERSION).orig.tar.gz
+	@echo "Downloading $($(shell echo $* | tr a-z- A-Z_)_URL)"
+	wget --no-check-certificate --retry-connrefused --waitretry=1 --read-timeout=20 --timeout=15 -t 3 \
+		$($(shell echo $* | tr a-z- A-Z_)_URL) -O $(BUILD_DIR)/$*_$($(shell echo $* | tr a-z- A-Z_)_VERSION).orig.tar.gz
 	tar -xzf $(BUILD_DIR)/$*_$($(shell echo $* | tr a-z- A-Z_)_VERSION).orig.tar.gz -C $(BUILD_DIR)/
 
 build-%:
