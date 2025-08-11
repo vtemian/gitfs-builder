@@ -71,10 +71,16 @@ build-%:
 		&& dch -b -D $(BUILD_DIST) -v $($(shell echo $* | tr a-z- A-Z_)_VERSION)-$(BUILD_VERSION) "Automated build of $* $($*_VERSION) $(COMMIT)" \
 		&& if gpg --list-secret-keys vladtemian@gmail.com >/dev/null 2>&1; then \
 			echo "Building with GPG signing..." && \
-			debuild -d -S -sa --lintian-opts --allow-root -p"gpg --batch --pinentry-mode loopback"; \
+			echo "use-agent" > ~/.gnupg/gpg.conf && \
+			echo "pinentry-mode loopback" >> ~/.gnupg/gpg.conf && \
+			echo "allow-loopback-pinentry" > ~/.gnupg/gpg-agent.conf && \
+			gpgconf --kill gpg-agent && \
+			gpgconf --launch gpg-agent && \
+			export GPG_TTY=/dev/null && \
+			dpkg-buildpackage -d -S -sa -k"vladtemian@gmail.com"; \
 		else \
 			echo "Building without GPG signing..." && \
-			debuild -d -S -sa -us -uc --lintian-opts --allow-root; \
+			dpkg-buildpackage -d -S -sa -us -uc; \
 		fi
 
 clean:
