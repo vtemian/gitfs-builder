@@ -71,18 +71,16 @@ build-%:
 	ls -la $(BUILD_DIR)
 	cd $(BUILD_DIR)/$*-$($(shell echo $* | tr a-z- A-Z_)_VERSION) \
 		&& dch -b -D $(BUILD_DIST) -v $($(shell echo $* | tr a-z- A-Z_)_VERSION)-$(BUILD_VERSION) "Automated build of $* $($*_VERSION) $(COMMIT)" \
+		&& echo "Building package (unsigned first)..." \
+		&& dpkg-buildpackage -d -S -sa -us -uc \
 		&& if gpg --list-secret-keys vladtemian@gmail.com >/dev/null 2>&1; then \
-			echo "Building with GPG signing..." && \
-			echo "use-agent" > ~/.gnupg/gpg.conf && \
-			echo "pinentry-mode loopback" >> ~/.gnupg/gpg.conf && \
-			echo "allow-loopback-pinentry" > ~/.gnupg/gpg-agent.conf && \
-			gpgconf --kill gpg-agent && \
-			gpgconf --launch gpg-agent && \
-			export GPG_TTY=/dev/null && \
-			dpkg-buildpackage -d -S -sa -k"vladtemian@gmail.com"; \
+			echo "Signing package with GPG..." && \
+			export GNUPGHOME=~/.gnupg && \
+			export GPG_TTY="" && \
+			cd .. && \
+			echo "" | GNUPGHOME=~/.gnupg debsign --no-re-sign -k vladtemian@gmail.com $*_$($(shell echo $* | tr a-z- A-Z_)_VERSION)-$(BUILD_VERSION)_source.changes; \
 		else \
-			echo "Building without GPG signing..." && \
-			dpkg-buildpackage -d -S -sa -us -uc; \
+			echo "Skipping GPG signing (no key available)"; \
 		fi
 
 clean:
