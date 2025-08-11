@@ -77,8 +77,7 @@ build-%:
 			echo "Signing package with GPG..." && \
 			cd .. && \
 			export GNUPGHOME=~/.gnupg && \
-			export DEBSIGN_PROGRAM="$(CURDIR)/gpg-batch-wrapper.sh" && \
-			debsign --no-re-sign -k vladtemian@gmail.com $*_$($(shell echo $* | tr a-z- A-Z_)_VERSION)-$(BUILD_VERSION)_source.changes; \
+			debsign -p "$(CURDIR)/gpg-batch-wrapper.sh" --no-re-sign -k vladtemian@gmail.com $*_$($(shell echo $* | tr a-z- A-Z_)_VERSION)-$(BUILD_VERSION)_source.changes; \
 		else \
 			echo "Skipping GPG signing (no key available)"; \
 		fi

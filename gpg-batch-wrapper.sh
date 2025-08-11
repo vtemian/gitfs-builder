@@ -4,7 +4,7 @@
 
 set -euo pipefail
 
-args=("--batch" "--yes" "--pinentry-mode" "loopback")
+args=("--batch" "--yes" "--no-tty" "--pinentry-mode" "loopback")
 
 # If a passphrase is provided via env, pass it to gpg
 if [[ -n "${GPG_PASSPHRASE:-}" ]]; then
