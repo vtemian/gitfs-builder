@@ -3,7 +3,7 @@ include VERSIONS
 # We check for GitHub Actions environment to set the target accordingly if we
 # are within a CI environment
 ifdef GITHUB_ACTIONS
-	TARGET ?= /github/workspace/build
+	TARGET ?= $(CURDIR)/build
 else
 	TARGET ?= /target/build
 endif
