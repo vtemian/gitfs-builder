@@ -73,11 +73,11 @@ build-%:
 		&& dch -b -D $(BUILD_DIST) -v $($(shell echo $* | tr a-z- A-Z_)_VERSION)-$(BUILD_VERSION) "Automated build of $* $($*_VERSION) $(COMMIT)" \
 		&& echo "Building package (unsigned first)..." \
 		&& dpkg-buildpackage -d -S -sa -us -uc \
-		&& if gpg --list-secret-keys vladtemian@gmail.com >/dev/null 2>&1; then \
+		&& if gpg --list-secret-keys $(SIGNING_KEY) >/dev/null 2>&1; then \
 			echo "Signing package with GPG..." && \
 			cd .. && \
 			export GNUPGHOME=~/.gnupg && \
-			debsign -p "$(CURDIR)/gpg-batch-wrapper.sh" --no-re-sign -k vladtemian@gmail.com $*_$($(shell echo $* | tr a-z- A-Z_)_VERSION)-$(BUILD_VERSION)_source.changes; \
+			debsign -p "$(CURDIR)/gpg-batch-wrapper.sh" --no-re-sign -k $(SIGNING_KEY) $*_$($(shell echo $* | tr a-z- A-Z_)_VERSION)-$(BUILD_VERSION)_source.changes; \
 		else \
 			echo "Skipping GPG signing (no key available)"; \
 		fi
@@ -86,3 +86,4 @@ clean:
 	rm -rf $(BUILD_DIR)
 
 .PHONY: all prepare build clean get-% mkdir-%
+SIGNING_KEY ?= $(if $(GPG_KEY_ID),$(GPG_KEY_ID),vladtemian@gmail.com)
