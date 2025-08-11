@@ -30,9 +30,10 @@ jobs:
           libhttp-parser-dev libkrb5-dev python-is-python3
     
     - name: Import PGP key
-      if: ${{ env.PGP_KEY != '' }}
+      if: ${{ secrets.PGP_KEY != '' }}
       env:
         PGP_KEY: ${{ secrets.PGP_KEY }}
+        GPG_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}
       run: |
         # Create GPG directories and configure for non-interactive mode
         mkdir -p ~/.gnupg
@@ -71,6 +72,7 @@ jobs:
         GITHUB_RUN_NUMBER: ${{ github.run_number }}
         GITHUB_REF_NAME: ${{ github.ref_name }}
         GNUPGHOME: /home/runner/.gnupg
+        GPG_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}
       run: |
         make clean
         make build
@@ -82,7 +84,7 @@ jobs:
         path: build/
     
     - name: Deploy to PPA (master branch)
-      if: github.ref == 'refs/heads/master' && github.event_name == 'push' && env.PGP_KEY != ''
+      if: github.ref == 'refs/heads/master' && github.event_name == 'push' && secrets.PGP_KEY != ''
       env:
         PGP_KEY: ${{ secrets.PGP_KEY }}
       run: |

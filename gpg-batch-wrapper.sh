@@ -1,6 +1,14 @@
 #!/bin/bash
 # GPG wrapper script for non-interactive signing in CI environments
-# This script forces batch mode and prevents TTY access attempts
+# Forces batch mode and loopback pinentry; optionally injects a passphrase
 
-# Always add batch mode and loopback pinentry
-exec gpg --batch --yes --pinentry-mode loopback "$@"
+set -euo pipefail
+
+args=("--batch" "--yes" "--pinentry-mode" "loopback")
+
+# If a passphrase is provided via env, pass it to gpg
+if [[ -n "${GPG_PASSPHRASE:-}" ]]; then
+  args+=("--passphrase" "${GPG_PASSPHRASE}")
+fi
+
+exec gpg "${args[@]}" "$@"
