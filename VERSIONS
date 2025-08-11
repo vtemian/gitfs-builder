@@ -1,6 +1,6 @@
 # vim: set ft=make:
 
-GITFS_VERSION := 0.5.2
+GITFS_VERSION := 1.0.0
 
 DEPENDENCIES := libgit2 python-pex
 PYTHON_PEX_VERSION := 2.50.2
@@ -15,7 +15,7 @@ PYCPARSER_VERSION := 2.22
 PYGIT2_VERSION := 1.18.0
 SENTRY_SDK_VERSION := 2.30.0
 
-GITFS_URL := https://github.com/Presslabs/gitfs/archive/$(GITFS_VERSION).tar.gz
+GITFS_URL := https://github.com/vtemian/gitfs/archive/refs/tags/v$(GITFS_VERSION).tar.gz
 LIBGIT2_URL := https://github.com/libgit2/libgit2/archive/v$(LIBGIT2_VERSION).tar.gz
 PYTHON_PEX_URL := https://github.com/pantsbuild/pex/archive/v$(PYTHON_PEX_VERSION).tar.gz
 
