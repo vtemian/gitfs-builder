@@ -1,1 +1,1 @@
-handle-pkg_resources-devendorization.patch
+## Dropped: no longer applicable to pex>=2.50
