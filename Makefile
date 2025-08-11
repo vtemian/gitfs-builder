@@ -69,7 +69,11 @@ build-%:
 	ls -la $(BUILD_DIR)
 	cd $(BUILD_DIR)/$*-$($(shell echo $* | tr a-z- A-Z_)_VERSION) \
 		&& dch -b -D $(BUILD_DIST) -v $($(shell echo $* | tr a-z- A-Z_)_VERSION)-$(BUILD_VERSION) "Automated build of $* $($*_VERSION) $(COMMIT)" \
-		&& debuild -d -S -sa --lintian-opts --allow-root
+		&& if gpg --list-secret-keys vladtemian@gmail.com >/dev/null 2>&1; then \
+			debuild -d -S -sa --lintian-opts --allow-root; \
+		else \
+			debuild -d -S -sa -us -uc --lintian-opts --allow-root; \
+		fi
 
 clean:
 	rm -rf $(BUILD_DIR)
