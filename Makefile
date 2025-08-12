@@ -99,7 +99,7 @@ build-gitfs: prepare-gitfs $(addprefix retrieve-package-, $(PACKAGES))
 			echo "Skipping GPG signing (no key available)"; \
 		fi
 
-build-%:
+build-%: prepare-%
 	@echo Building $($*_VERSION) source
 	ls -la $(BUILD_DIR)
 	cd $(BUILD_DIR)/$*-$($(shell echo $* | tr a-z- A-Z_)_VERSION) \
