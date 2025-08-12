@@ -32,4 +32,4 @@ SENTRY_SDK_URL := https://files.pythonhosted.org/packages/04/4c/af31e0201b484697
 PIP_URL := https://files.pythonhosted.org/packages/source/p/pip/pip-$(PIP_VERSION).tar.gz
 SETUPTOOLS_URL := https://files.pythonhosted.org/packages/source/s/setuptools/setuptools-$(SETUPTOOLS_VERSION).tar.gz
 WHEEL_URL := https://files.pythonhosted.org/packages/source/w/wheel/wheel-$(WHEEL_VERSION).tar.gz
-FLIT_CORE_URL := https://files.pythonhosted.org/packages/38/45/618e84e49a6c51e5dd15565ec2fcd82ab273434f236b8f108f065ded517a/flit_core-$(FLIT_CORE_VERSION)-py3-none-any.whl
+FLIT_CORE_URL := https://files.pythonhosted.org/packages/source/f/flit-core/flit_core-$(FLIT_CORE_VERSION).tar.gz
