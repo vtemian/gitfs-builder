@@ -7,13 +7,16 @@ PYTHON_PEX_VERSION := 2.50.2
 # Align with pygit2 >=1.17 which upgrades to libgit2 1.9
 LIBGIT2_VERSION := 1.9.0
 
-PACKAGES := atomiclong cffi mfusepy pycparser pygit2 sentry-sdk
+PACKAGES := atomiclong cffi mfusepy pycparser pygit2 sentry-sdk pip setuptools wheel
 ATOMICLONG_VERSION := 0.1.1
 CFFI_VERSION := 1.17.1
 MFUSEPY_VERSION := 1.1.0
 PYCPARSER_VERSION := 2.22
 PYGIT2_VERSION := 1.18.0
 SENTRY_SDK_VERSION := 2.30.0
+PIP_VERSION := 23.2
+SETUPTOOLS_VERSION := 68.0.0
+WHEEL_VERSION := 0.40.0
 
 GITFS_URL := https://github.com/vtemian/gitfs/archive/refs/tags/v$(GITFS_VERSION).tar.gz
 LIBGIT2_URL := https://github.com/libgit2/libgit2/archive/v$(LIBGIT2_VERSION).tar.gz
@@ -25,3 +28,6 @@ MFUSEPY_URL := https://files.pythonhosted.org/packages/8b/37/b29c414d76e8d709b6e
 PYCPARSER_URL := https://files.pythonhosted.org/packages/1d/b2/31537cf4b1ca988837256c910a668b553fceb8f069bedc4b1c826024b52c/pycparser-$(PYCPARSER_VERSION).tar.gz
 PYGIT2_URL := https://github.com/libgit2/pygit2/archive/refs/tags/v$(PYGIT2_VERSION).tar.gz
 SENTRY_SDK_URL := https://files.pythonhosted.org/packages/04/4c/af31e0201b48469786ddeb1bf6fd3dfa3a291cc613a0fe6a60163a7535f9/sentry_sdk-$(SENTRY_SDK_VERSION).tar.gz
+PIP_URL := https://files.pythonhosted.org/packages/source/p/pip/pip-$(PIP_VERSION).tar.gz
+SETUPTOOLS_URL := https://files.pythonhosted.org/packages/source/s/setuptools/setuptools-$(SETUPTOOLS_VERSION).tar.gz
+WHEEL_URL := https://files.pythonhosted.org/packages/source/w/wheel/wheel-$(WHEEL_VERSION).tar.gz
