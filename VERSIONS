@@ -34,4 +34,4 @@ PIP_URL := https://files.pythonhosted.org/packages/source/p/pip/pip-$(PIP_VERSIO
 SETUPTOOLS_URL := https://files.pythonhosted.org/packages/source/s/setuptools/setuptools-$(SETUPTOOLS_VERSION).tar.gz
 WHEEL_URL := https://files.pythonhosted.org/packages/source/w/wheel/wheel-$(WHEEL_VERSION).tar.gz
 FLIT_CORE_URL := https://files.pythonhosted.org/packages/source/f/flit-core/flit_core-$(FLIT_CORE_VERSION).tar.gz
-HATCHLING_URL := https://files.pythonhosted.org/packages/e1/32/df8ffa9c6a0cc016b7a55e0f726f014be11eac92e37c0cfbf3e690f7e59e/hatchling-$(HATCHLING_VERSION).tar.gz
+HATCHLING_URL := https://files.pythonhosted.org/packages/e1/47/7ec270a9567262ae3cb32dd420d2b53bf7aee769aca1f240eae0426b5bbc/hatchling-$(HATCHLING_VERSION).tar.gz
