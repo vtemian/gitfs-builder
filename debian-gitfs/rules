@@ -38,15 +38,23 @@ override_dh_auto_build:
 	python3 -m venv $(CURDIR)/build/venv
 	# Upgrade pip to ensure wheel support
 	$(CURDIR)/build/venv/bin/pip install --upgrade --no-index --find-links=$(CURDIR)/debian/packages pip setuptools wheel
-	# Manually unpack and install wheel files into the venv
-	mkdir -p $(CURDIR)/build/unpacked_wheels
-	cd $(CURDIR)/debian/packages && for wheel in *.whl; do \
-		echo "Unpacking $$wheel"; \
-		unzip -q -o "$$wheel" -d $(CURDIR)/build/unpacked_wheels/$$wheel.d || true; \
-		if [ -d $(CURDIR)/build/unpacked_wheels/$$wheel.d ]; then \
-			cp -r $(CURDIR)/build/unpacked_wheels/$$wheel.d/* $(CURDIR)/build/venv/lib/python3.12/site-packages/ 2>/dev/null || true; \
-		fi; \
-	done
+	# Manually unpack and install wheel files into the venv using Python's zipfile
+	$(CURDIR)/build/venv/bin/python3 -c "
+import os
+import zipfile
+import shutil
+from pathlib import Path
+
+packages_dir = Path('$(CURDIR)/debian/packages')
+site_packages = Path('$(CURDIR)/build/venv/lib/python3.12/site-packages')
+
+for wheel_path in packages_dir.glob('*.whl'):
+    print(f'Unpacking {wheel_path.name}')
+    with zipfile.ZipFile(wheel_path, 'r') as wheel:
+        # Extract directly to site-packages
+        wheel.extractall(site_packages)
+    print(f'Installed {wheel_path.name}')
+"
 	# Also ensure flit-core is available for building
 	$(CURDIR)/build/venv/bin/pip install --no-index --find-links=$(CURDIR)/debian/packages flit-core || true
 	# Pre-build the gitfs wheel using pip with build deps available
