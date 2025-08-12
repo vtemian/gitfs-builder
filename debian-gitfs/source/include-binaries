@@ -1,0 +1,15 @@
+debian/packages/hatchling-1.26.3.whl
+debian/packages/packaging-24.2.whl
+debian/packages/pathspec-0.12.1.whl
+debian/packages/pluggy-1.5.0.whl
+debian/packages/trove-classifiers-2024.10.21.16.whl
+debian/packages/atomiclong-0.1.1.tar.gz
+debian/packages/cffi-1.17.1.tar.gz
+debian/packages/mfusepy-1.1.0.tar.gz
+debian/packages/pycparser-2.22.tar.gz
+debian/packages/pygit2-1.18.0.tar.gz
+debian/packages/sentry-sdk-2.30.0.tar.gz
+debian/packages/pip-23.2.tar.gz
+debian/packages/setuptools-68.0.0.tar.gz
+debian/packages/wheel-0.40.0.tar.gz
+debian/packages/flit-core-3.9.0.tar.gz
