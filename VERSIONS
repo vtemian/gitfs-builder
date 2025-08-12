@@ -7,7 +7,7 @@ PYTHON_PEX_VERSION := 2.50.2
 # Align with pygit2 >=1.17 which upgrades to libgit2 1.9
 LIBGIT2_VERSION := 1.9.0
 
-PACKAGES := atomiclong cffi mfusepy pycparser pygit2 sentry-sdk pip setuptools wheel flit-core hatchling
+PACKAGES := atomiclong cffi mfusepy pycparser pygit2 sentry-sdk pip setuptools wheel flit-core hatchling packaging pathspec pluggy trove-classifiers
 ATOMICLONG_VERSION := 0.1.1
 CFFI_VERSION := 1.17.1
 MFUSEPY_VERSION := 1.1.0
@@ -19,6 +19,10 @@ SETUPTOOLS_VERSION := 68.0.0
 WHEEL_VERSION := 0.40.0
 FLIT_CORE_VERSION := 3.9.0
 HATCHLING_VERSION := 1.26.3
+PACKAGING_VERSION := 24.2
+PATHSPEC_VERSION := 0.12.1
+PLUGGY_VERSION := 1.5.0
+TROVE_CLASSIFIERS_VERSION := 2024.10.21.16
 
 GITFS_URL := https://github.com/vtemian/gitfs/archive/refs/tags/v$(GITFS_VERSION).tar.gz
 LIBGIT2_URL := https://github.com/libgit2/libgit2/archive/v$(LIBGIT2_VERSION).tar.gz
@@ -35,3 +39,7 @@ SETUPTOOLS_URL := https://files.pythonhosted.org/packages/source/s/setuptools/se
 WHEEL_URL := https://files.pythonhosted.org/packages/source/w/wheel/wheel-$(WHEEL_VERSION).tar.gz
 FLIT_CORE_URL := https://files.pythonhosted.org/packages/source/f/flit-core/flit_core-$(FLIT_CORE_VERSION).tar.gz
 HATCHLING_URL := https://files.pythonhosted.org/packages/e1/47/7ec270a9567262ae3cb32dd420d2b53bf7aee769aca1f240eae0426b5bbc/hatchling-$(HATCHLING_VERSION).tar.gz
+PACKAGING_URL := https://files.pythonhosted.org/packages/source/p/packaging/packaging-$(PACKAGING_VERSION).tar.gz
+PATHSPEC_URL := https://files.pythonhosted.org/packages/source/p/pathspec/pathspec-$(PATHSPEC_VERSION).tar.gz
+PLUGGY_URL := https://files.pythonhosted.org/packages/source/p/pluggy/pluggy-$(PLUGGY_VERSION).tar.gz
+TROVE_CLASSIFIERS_URL := https://files.pythonhosted.org/packages/source/t/trove-classifiers/trove_classifiers-$(TROVE_CLASSIFIERS_VERSION).tar.gz
