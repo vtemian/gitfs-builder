@@ -20,22 +20,22 @@ override_dh_auto_configure:
 	@echo "find_links = file://$(shell pwd)/debian/packages/" >> $(shell pwd)/.pydistutils.cfg
 
 override_dh_auto_build:
-    # Build a self-contained pex without invoking upstream Makefile (no uv in chroot)
-    mkdir -p build/src
-    # Create a clean copy of the source, excluding venvs and build artifacts that break pex hashing
-    tar -C $(CURDIR) \
-        --exclude=./debian \
-        --exclude=./build \
-        --exclude=./.git \
-        --exclude=./.venv \
-        --exclude=./test_venv \
-        -cf - . | tar -C build/src -xf -
-    export HOME=$(CURDIR) && \
-        /usr/bin/pex -v --disable-cache \
-        --pex-root=$(CURDIR)/debian/packages \
-        --repo=$(CURDIR)/debian/packages \
-        --find-links=$(CURDIR)/debian/packages \
-        build/src -m gitfs:mount -o build/gitfs
+	# Build a self-contained pex without invoking upstream Makefile (no uv in chroot)
+	mkdir -p build/src
+	# Create a clean copy of the source, excluding venvs and build artifacts that break pex hashing
+	tar -C $(CURDIR) \
+		--exclude=./debian \
+		--exclude=./build \
+		--exclude=./.git \
+		--exclude=./.venv \
+		--exclude=./test_venv \
+		-cf - . | tar -C build/src -xf -
+	export HOME=$(CURDIR) && \
+		/usr/bin/pex -v --disable-cache \
+		--pex-root=$(CURDIR)/debian/packages \
+		--repo=$(CURDIR)/debian/packages \
+		--find-links=$(CURDIR)/debian/packages \
+		build/src -m gitfs:mount -o build/gitfs
 
 override_dh_auto_install:
 	mkdir -p debian/gitfs/usr/bin
