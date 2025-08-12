@@ -48,7 +48,7 @@ override_dh_auto_install:
 	dh_auto_install --builddirectory=build-debian-release
 	dh_auto_install --builddirectory=build-debian-devel
 
-	override_dh_auto_test:
+override_dh_auto_test:
 	@echo "Skipping libgit2 tests in PPA build"
 	true
 
