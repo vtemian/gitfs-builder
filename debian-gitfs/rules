@@ -31,7 +31,7 @@ override_dh_auto_build:
 		--exclude=./test_venv \
 		-cf - . | tar -C build/src -xf -
 	export HOME=$(CURDIR) && \
-		/usr/bin/pex -v --disable-cache \
+		/usr/bin/pex -v --disable-cache --no-pypi \
 		--pex-root=$(CURDIR)/debian/packages \
 		--repo=$(CURDIR)/debian/packages \
 		--find-links=$(CURDIR)/debian/packages \
