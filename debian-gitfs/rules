@@ -19,4 +19,18 @@ override_dh_auto_configure:
 	@echo "allow_hosts = ''" >> $(shell pwd)/.pydistutils.cfg
 	@echo "find_links = file://$(shell pwd)/debian/packages/" >> $(shell pwd)/.pydistutils.cfg
 
+override_dh_auto_build:
+	# Build a self-contained pex without invoking upstream Makefile (no uv in chroot)
+	mkdir -p build
+	export HOME=$(CURDIR) && \
+		/usr/bin/pex -v --disable-cache \
+		--cache-dir=$(CURDIR)/debian/packages \
+		--repo=$(CURDIR)/debian/packages \
+		--find-links=$(CURDIR)/debian/packages \
+		. -m gitfs:mount -o build/gitfs
+
+override_dh_auto_install:
+	mkdir -p debian/gitfs/usr/bin
+	install -m 0755 build/gitfs debian/gitfs/usr/bin/gitfs
+
 override_dh_auto_test:
