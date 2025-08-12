@@ -38,10 +38,14 @@ override_dh_auto_build:
 	python3 -m venv $(CURDIR)/build/venv
 	# Upgrade pip to ensure wheel support
 	$(CURDIR)/build/venv/bin/pip install --upgrade --no-index --find-links=$(CURDIR)/debian/packages pip setuptools wheel
-	# Install each wheel file directly using find
-	for wheel in $(CURDIR)/debian/packages/*.whl; do \
-		echo "Installing $$wheel"; \
-		$(CURDIR)/build/venv/bin/pip install --no-deps "$$wheel" || true; \
+	# Manually unpack and install wheel files into the venv
+	mkdir -p $(CURDIR)/build/unpacked_wheels
+	cd $(CURDIR)/debian/packages && for wheel in *.whl; do \
+		echo "Unpacking $$wheel"; \
+		unzip -q -o "$$wheel" -d $(CURDIR)/build/unpacked_wheels/$$wheel.d || true; \
+		if [ -d $(CURDIR)/build/unpacked_wheels/$$wheel.d ]; then \
+			cp -r $(CURDIR)/build/unpacked_wheels/$$wheel.d/* $(CURDIR)/build/venv/lib/python3.12/site-packages/ 2>/dev/null || true; \
+		fi; \
 	done
 	# Also ensure flit-core is available for building
 	$(CURDIR)/build/venv/bin/pip install --no-index --find-links=$(CURDIR)/debian/packages flit-core || true
