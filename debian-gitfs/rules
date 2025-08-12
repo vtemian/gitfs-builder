@@ -30,13 +30,14 @@ override_dh_auto_build:
 		--exclude=./.venv \
 		--exclude=./test_venv \
 		-cf - . | tar -C build/src -xf -
-	# Install hatchling and dependencies locally to satisfy build requirements
-	export HOME=$(CURDIR) && \
-		python3 -m pip install --user --no-index --find-links=$(CURDIR)/debian/packages \
+	# Create a virtual environment for build dependencies
+	python3 -m venv $(CURDIR)/build/venv
+	# Install hatchling and dependencies in the venv
+	$(CURDIR)/build/venv/bin/pip install --no-index --find-links=$(CURDIR)/debian/packages \
 		hatchling packaging pathspec pluggy trove-classifiers
 	# Pre-build the gitfs wheel using pip with build deps available
 	export HOME=$(CURDIR) && \
-		python3 -m pip wheel --no-deps --no-index --no-build-isolation \
+		$(CURDIR)/build/venv/bin/pip wheel --no-deps --no-index --no-build-isolation \
 		--find-links=$(CURDIR)/debian/packages \
 		--wheel-dir=$(CURDIR)/build/wheels build/src
 	# Now build the pex from the wheel
