@@ -51,8 +51,10 @@ prepare-%: get-%
 	@cp -r debian-$* $(BUILD_DIR)/$*-$($(shell echo $* | tr a-z- A-Z_)_VERSION)/debian
 
 retrieve-package-%: $(PACKAGES_DIR)
-	wget -q $($(shell echo $* | tr a-z- A-Z_)_URL) -O $(PACKAGES_DIR)/$(shell echo $*)-$($(shell echo $* | tr a-z- A-Z_)_VERSION).tar.gz
-	echo debian/packages/$(shell echo $*)-$($(shell echo $* | tr a-z- A-Z_)_VERSION).tar.gz >> $(GITFS_DIR)/debian/source/include-binaries
+	$(eval PKG_URL := $($(shell echo $* | tr a-z- A-Z_)_URL))
+	$(eval PKG_EXT := $(if $(findstring .whl,$(PKG_URL)),.whl,.tar.gz))
+	wget -q $(PKG_URL) -O $(PACKAGES_DIR)/$(shell echo $*)-$($(shell echo $* | tr a-z- A-Z_)_VERSION)$(PKG_EXT)
+	echo debian/packages/$(shell echo $*)-$($(shell echo $* | tr a-z- A-Z_)_VERSION)$(PKG_EXT) >> $(GITFS_DIR)/debian/source/include-binaries
 
 get-python-pex:
 	wget -q $(PYTHON_PEX_URL) -O $(BUILD_DIR)/python-pex_$(PYTHON_PEX_VERSION).orig.tar.gz
