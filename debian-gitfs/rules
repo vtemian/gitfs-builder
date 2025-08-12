@@ -15,13 +15,11 @@ export LC_ALL=en_US.UTF-8
 	dh $@
 
 override_dh_auto_configure:
-	@echo "[easy_install]" >> $(shell pwd)/.pydistutils.cfg
-	@echo "allow_hosts = ''" >> $(shell pwd)/.pydistutils.cfg
-	@echo "find_links = file://$(shell pwd)/debian/packages/" >> $(shell pwd)/.pydistutils.cfg
+	# Skip pydistutils.cfg creation to avoid conflicts with pip
 
 override_dh_auto_build:
 	# Build a self-contained pex without invoking upstream Makefile (no uv in chroot)
-	mkdir -p build/src
+	mkdir -p build/src build/wheels
 	# Create a clean copy of the source, excluding venvs and build artifacts that break pex hashing
 	tar -C $(CURDIR) \
 		--exclude=./debian \
@@ -30,10 +28,6 @@ override_dh_auto_build:
 		--exclude=./.venv \
 		--exclude=./test_venv \
 		-cf - . | tar -C build/src -xf -
-	# Debug: List available packages
-	@echo "=== Available packages in debian/packages ==="
-	ls -la $(CURDIR)/debian/packages/ || true
-	@echo "=== End of package listing ==="
 	# Create a virtual environment for build dependencies
 	python3 -m venv $(CURDIR)/build/venv
 	# Upgrade pip to ensure wheel support
@@ -42,19 +36,30 @@ override_dh_auto_build:
 	$(CURDIR)/build/venv/bin/python3 -c "import os; import zipfile; import shutil; from pathlib import Path; packages_dir = Path('$(CURDIR)/debian/packages'); site_packages = Path('$(CURDIR)/build/venv/lib/python3.12/site-packages'); [print(f'Unpacking {wheel_path.name}') or zipfile.ZipFile(wheel_path, 'r').extractall(site_packages) or print(f'Installed {wheel_path.name}') for wheel_path in packages_dir.glob('*.whl')]"
 	# Also ensure flit-core is available for building
 	$(CURDIR)/build/venv/bin/pip install --no-index --find-links=$(CURDIR)/debian/packages flit-core || true
+	# Build all source packages to wheels first
+	for pkg in $(CURDIR)/debian/packages/*.tar.gz; do \
+		if [ -f "$$pkg" ]; then \
+			echo "Building wheel for $$pkg"; \
+			$(CURDIR)/build/venv/bin/pip wheel --no-deps --no-index --no-build-isolation \
+				--find-links=$(CURDIR)/debian/packages \
+				--wheel-dir=$(CURDIR)/build/wheels "$$pkg" || true; \
+		fi; \
+	done
+	# Copy existing wheels to build/wheels
+	cp $(CURDIR)/debian/packages/*.whl $(CURDIR)/build/wheels/ || true
 	# Pre-build the gitfs wheel using pip with build deps available
 	export HOME=$(CURDIR) && \
 		$(CURDIR)/build/venv/bin/pip wheel --no-deps --no-index --no-build-isolation \
-		--find-links=$(CURDIR)/debian/packages \
-		--wheel-dir=$(CURDIR)/build/wheels build/src
-	# Now build the pex from the wheel
-	export HOME=$(CURDIR) PIP_NO_INDEX=1 PIP_FIND_LINKS=$(CURDIR)/debian/packages && \
-		/usr/bin/pex -v --disable-cache --no-pypi \
-		--pex-root=$(CURDIR)/debian/packages \
-		--repo=$(CURDIR)/debian/packages \
-		--find-links=$(CURDIR)/debian/packages \
 		--find-links=$(CURDIR)/build/wheels \
-		gitfs -m gitfs:mount -o build/gitfs
+		--wheel-dir=$(CURDIR)/build/wheels build/src
+	# Now build the pex from the wheels only (no source distributions)
+	export HOME=$(CURDIR) && \
+		/usr/bin/pex -v --disable-cache --no-pypi \
+		--no-build \
+		--wheel \
+		--repo=$(CURDIR)/build/wheels \
+		gitfs atomiclong cffi fusepy pycparser pygit2 sentry-sdk \
+		-m gitfs:mount -o build/gitfs
 
 override_dh_auto_install:
 	mkdir -p debian/gitfs/usr/bin
