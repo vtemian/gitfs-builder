@@ -42,9 +42,9 @@ $(PACKAGES_DIR):
 
 all: build
 
-build: $(BUILD_DIR) prepare build-gitfs
+build: $(BUILD_DIR) $(BUILD_DEPS) build-gitfs
 
-prepare: $(PREPARE_DEPS) $(BUILD_DEPS) prepare-gitfs $(addprefix retrieve-package-, $(PACKAGES))
+prepare: $(PREPARE_DEPS) $(BUILD_DEPS)
 
 prepare-%: get-%
 	ls -la $(BUILD_DIR)/
@@ -55,6 +55,14 @@ retrieve-package-%: $(PACKAGES_DIR)
 	$(eval PKG_EXT := $(if $(findstring .whl,$(PKG_URL)),.whl,.tar.gz))
 	wget -q $(PKG_URL) -O $(PACKAGES_DIR)/$(shell echo $*)-$($(shell echo $* | tr a-z- A-Z_)_VERSION)$(PKG_EXT)
 	echo debian/packages/$(shell echo $*)-$($(shell echo $* | tr a-z- A-Z_)_VERSION)$(PKG_EXT) >> $(GITFS_DIR)/debian/source/include-binaries
+
+get-gitfs:
+	@echo "Downloading gitfs $(GITFS_VERSION)"
+	wget -q $(GITFS_URL) -O $(BUILD_DIR)/gitfs_$(GITFS_VERSION).orig.tar.gz
+	tar -xzf $(BUILD_DIR)/gitfs_$(GITFS_VERSION).orig.tar.gz -C $(BUILD_DIR)/
+
+prepare-gitfs: get-gitfs
+	@cp -r debian-gitfs $(GITFS_DIR)/debian
 
 get-python-pex:
 	wget -q $(PYTHON_PEX_URL) -O $(BUILD_DIR)/python-pex_$(PYTHON_PEX_VERSION).orig.tar.gz
@@ -67,6 +75,29 @@ get-%:
 	wget --no-check-certificate --retry-connrefused --waitretry=1 --read-timeout=20 --timeout=15 -t 3 \
 		$($(shell echo $* | tr a-z- A-Z_)_URL) -O $(BUILD_DIR)/$*_$($(shell echo $* | tr a-z- A-Z_)_VERSION).orig.tar.gz
 	tar -xzf $(BUILD_DIR)/$*_$($(shell echo $* | tr a-z- A-Z_)_VERSION).orig.tar.gz -C $(BUILD_DIR)/
+
+build-gitfs: prepare-gitfs $(addprefix retrieve-package-, $(PACKAGES))
+	@echo "Building gitfs $(GITFS_VERSION) source package with packages included"
+	@echo "Verifying packages are included..."
+	@if [ ! -d "$(GITFS_DIR)/debian/packages" ] || [ -z "$$(ls -A $(GITFS_DIR)/debian/packages 2>/dev/null)" ]; then \
+		echo "ERROR: debian/packages directory is empty or missing!"; \
+		exit 1; \
+	fi
+	ls -la $(GITFS_DIR)/debian/packages/
+	@echo "Packages included in source:"
+	@cat $(GITFS_DIR)/debian/source/include-binaries
+	cd $(GITFS_DIR) \
+		&& dch -b -D $(BUILD_DIST) -v $(GITFS_VERSION)-$(BUILD_VERSION) "Automated build of gitfs $(GITFS_VERSION) $(COMMIT)" \
+		&& echo "Building package (unsigned first)..." \
+		&& dpkg-buildpackage -d -S -sa -us -uc \
+		&& if gpg --list-secret-keys $(SIGNING_KEY) >/dev/null 2>&1; then \
+			echo "Signing package with GPG..." && \
+			cd .. && \
+			export GNUPGHOME=~/.gnupg && \
+			debsign -p "$(CURDIR)/gpg-batch-wrapper.sh" --no-re-sign -k $(SIGNING_KEY) gitfs_$(GITFS_VERSION)-$(BUILD_VERSION)_source.changes; \
+		else \
+			echo "Skipping GPG signing (no key available)"; \
+		fi
 
 build-%:
 	@echo Building $($*_VERSION) source
