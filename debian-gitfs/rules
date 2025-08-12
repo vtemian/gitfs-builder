@@ -30,9 +30,21 @@ override_dh_auto_build:
 		--exclude=./.venv \
 		--exclude=./test_venv \
 		-cf - . | tar -C build/src -xf -
+	# Debug: List available packages
+	@echo "=== Available packages in debian/packages ==="
+	ls -la $(CURDIR)/debian/packages/ || true
+	@echo "=== End of package listing ==="
 	# Create a virtual environment for build dependencies
 	python3 -m venv $(CURDIR)/build/venv
-	# Install hatchling and dependencies in the venv
+	# Upgrade pip to ensure wheel support
+	$(CURDIR)/build/venv/bin/pip install --upgrade --no-index --find-links=$(CURDIR)/debian/packages pip setuptools wheel
+	# Install hatchling and dependencies in the venv (wheels can be installed directly)
+	$(CURDIR)/build/venv/bin/pip install --no-index --find-links=$(CURDIR)/debian/packages \
+		$(CURDIR)/debian/packages/hatchling-*.whl \
+		$(CURDIR)/debian/packages/packaging-*.whl \
+		$(CURDIR)/debian/packages/pathspec-*.whl \
+		$(CURDIR)/debian/packages/pluggy-*.whl \
+		$(CURDIR)/debian/packages/trove_classifiers-*.whl || \
 	$(CURDIR)/build/venv/bin/pip install --no-index --find-links=$(CURDIR)/debian/packages \
 		hatchling packaging pathspec pluggy trove-classifiers
 	# Pre-build the gitfs wheel using pip with build deps available
