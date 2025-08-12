@@ -38,15 +38,13 @@ override_dh_auto_build:
 	python3 -m venv $(CURDIR)/build/venv
 	# Upgrade pip to ensure wheel support
 	$(CURDIR)/build/venv/bin/pip install --upgrade --no-index --find-links=$(CURDIR)/debian/packages pip setuptools wheel
-	# Install hatchling and dependencies in the venv (wheels can be installed directly)
-	$(CURDIR)/build/venv/bin/pip install --no-index --find-links=$(CURDIR)/debian/packages \
-		$(CURDIR)/debian/packages/hatchling-*.whl \
-		$(CURDIR)/debian/packages/packaging-*.whl \
-		$(CURDIR)/debian/packages/pathspec-*.whl \
-		$(CURDIR)/debian/packages/pluggy-*.whl \
-		$(CURDIR)/debian/packages/trove_classifiers-*.whl || \
-	$(CURDIR)/build/venv/bin/pip install --no-index --find-links=$(CURDIR)/debian/packages \
-		hatchling packaging pathspec pluggy trove-classifiers
+	# Install each wheel file directly using find
+	for wheel in $(CURDIR)/debian/packages/*.whl; do \
+		echo "Installing $$wheel"; \
+		$(CURDIR)/build/venv/bin/pip install --no-deps "$$wheel" || true; \
+	done
+	# Also ensure flit-core is available for building
+	$(CURDIR)/build/venv/bin/pip install --no-index --find-links=$(CURDIR)/debian/packages flit-core || true
 	# Pre-build the gitfs wheel using pip with build deps available
 	export HOME=$(CURDIR) && \
 		$(CURDIR)/build/venv/bin/pip wheel --no-deps --no-index --no-build-isolation \
