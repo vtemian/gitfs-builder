@@ -36,45 +36,46 @@ override_dh_auto_build:
 	$(CURDIR)/build/venv/bin/python3 -c "import os; import zipfile; import shutil; from pathlib import Path; packages_dir = Path('$(CURDIR)/debian/packages'); site_packages = Path('$(CURDIR)/build/venv/lib/python3.12/site-packages'); [print(f'Unpacking {wheel_path.name}') or zipfile.ZipFile(wheel_path, 'r').extractall(site_packages) or print(f'Installed {wheel_path.name}') for wheel_path in packages_dir.glob('*.whl')]"
 	# Also ensure flit-core is available for building
 	$(CURDIR)/build/venv/bin/pip install --no-index --find-links=$(CURDIR)/debian/packages flit-core || true
-	# Build all source packages to wheels first
-	for pkg in $(CURDIR)/debian/packages/*.tar.gz; do \
-		if [ -f "$$pkg" ]; then \
-			echo "Building wheel for $$pkg"; \
-			$(CURDIR)/build/venv/bin/pip wheel --no-deps --no-index --no-build-isolation \
-				--find-links=$(CURDIR)/debian/packages \
-				--wheel-dir=$(CURDIR)/build/wheels "$$pkg" || true; \
-		fi; \
-	done
 	# Copy existing wheels to build/wheels
 	cp $(CURDIR)/debian/packages/*.whl $(CURDIR)/build/wheels/ || true
+	# Build source packages to wheels (skip atomiclong and mfusepy - handled separately)
+	for pkg in $(CURDIR)/debian/packages/*.tar.gz; do \
+		case "$$pkg" in \
+			*atomiclong*|*mfusepy*) ;; \
+			*) \
+				if [ -f "$$pkg" ]; then \
+					echo "Building wheel for $$pkg"; \
+					$(CURDIR)/build/venv/bin/pip wheel --no-deps --no-index --no-build-isolation \
+						--find-links=$(CURDIR)/debian/packages \
+						--wheel-dir=$(CURDIR)/build/wheels "$$pkg" || true; \
+				fi ;; \
+		esac; \
+	done
 	# Pre-build the gitfs wheel using pip with build deps available
 	export HOME=$(CURDIR) && \
 		$(CURDIR)/build/venv/bin/pip wheel --no-deps --no-index --no-build-isolation \
 		--find-links=$(CURDIR)/build/wheels \
 		--wheel-dir=$(CURDIR)/build/wheels build/src
-	# Now build the pex from the wheels only (no source distributions)
-	# First, manually install atomiclong and fusepy which failed to build as wheels
+	# Install cffi wheel first so atomiclong can use it
+	$(CURDIR)/build/venv/bin/pip install --no-index --find-links=$(CURDIR)/build/wheels cffi || true
+	# Build atomiclong wheel (needs cffi available)
 	cd $(CURDIR)/debian/packages && tar xzf atomiclong-0.1.1.tar.gz && \
 		cd atomiclong-0.1.1 && \
 		$(CURDIR)/build/venv/bin/python3 setup.py bdist_wheel --dist-dir=$(CURDIR)/build/wheels || true
+	# Build mfusepy wheel (fix pyproject.toml first)
 	cd $(CURDIR)/debian/packages && tar xzf mfusepy-1.1.0.tar.gz && \
 		cd mfusepy-1.1.0 && \
 		sed -i 's/license = "ISC"/license = {text = "ISC"}/' pyproject.toml && \
-		$(CURDIR)/build/venv/bin/python3 -m pip wheel --no-deps --no-index --wheel-dir=$(CURDIR)/build/wheels . || true
-	# Use pex with pre-populated pip/setuptools/wheel to avoid bootstrapping
+		$(CURDIR)/build/venv/bin/pip wheel --no-deps --no-index --no-build-isolation --wheel-dir=$(CURDIR)/build/wheels . || true
+	# Use pex 2.x syntax (no setuptools/wheel version flags)
 	export HOME=$(CURDIR) && \
-		cp $(CURDIR)/build/wheels/pip*.whl $(CURDIR)/build/wheels/pip-23.2-py3-none-any.whl || true && \
-		cp $(CURDIR)/build/wheels/setuptools*.whl $(CURDIR)/build/wheels/setuptools-68.0.0-py3-none-any.whl || true && \
-		cp $(CURDIR)/build/wheels/wheel*.whl $(CURDIR)/build/wheels/wheel-0.40.0-py3-none-any.whl || true && \
 		/usr/bin/pex -v --disable-cache --no-pypi \
-		--pip-version 23.2 \
-		--setuptools-version 68.0.0 \
-		--wheel-version 0.40.0 \
 		--no-build \
 		--pex-root=$(CURDIR)/build \
 		--find-links=$(CURDIR)/build/wheels \
 		gitfs atomiclong cffi mfusepy pycparser pygit2 sentry-sdk \
-		-m gitfs:mount -o build/gitfs
+		-m gitfs:mount \
+		-o build/gitfs
 
 override_dh_auto_install:
 	mkdir -p debian/gitfs/usr/bin
