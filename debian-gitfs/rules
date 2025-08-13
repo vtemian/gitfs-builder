@@ -32,6 +32,9 @@ override_dh_auto_build:
 	python3 -m venv $(CURDIR)/build/venv
 	# Upgrade pip to ensure wheel support
 	$(CURDIR)/build/venv/bin/pip install --upgrade --no-index --find-links=$(CURDIR)/debian/packages pip setuptools wheel
+	# Ensure build-time deps needed by pygit2 are available in the env
+	# pycparser is required to build cffi; cffi is required to build pygit2's _libgit2 module
+	$(CURDIR)/build/venv/bin/pip install --no-index --find-links=$(CURDIR)/debian/packages pycparser cffi || true
 	# Manually unpack and install wheel files into the venv using Python's zipfile
 	$(CURDIR)/build/venv/bin/python3 -c "import os; import zipfile; import shutil; from pathlib import Path; packages_dir = Path('$(CURDIR)/debian/packages'); site_packages = Path('$(CURDIR)/build/venv/lib/python3.12/site-packages'); [print(f'Unpacking {wheel_path.name}') or zipfile.ZipFile(wheel_path, 'r').extractall(site_packages) or print(f'Installed {wheel_path.name}') for wheel_path in packages_dir.glob('*.whl')]"
 	# Also ensure flit-core is available for building
@@ -46,7 +49,7 @@ override_dh_auto_build:
 				--wheel-dir=$(CURDIR)/build/wheels "$$pkg" || true; \
 		fi; \
 	done
-	# Build other source packages to wheels (skip atomiclong and mfusepy - handled separately)
+	# Build other source packages to wheels (skip atomiclong, mfusepy, and build backends handled separately)
 	for pkg in $(CURDIR)/debian/packages/*.tar.gz; do \
 		case "$$pkg" in \
 			*atomiclong*|*mfusepy*|*pip-*|*setuptools-*|*wheel-*) ;; \
