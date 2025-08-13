@@ -38,10 +38,18 @@ override_dh_auto_build:
 	$(CURDIR)/build/venv/bin/pip install --no-index --find-links=$(CURDIR)/debian/packages flit-core || true
 	# Copy existing wheels to build/wheels
 	cp $(CURDIR)/debian/packages/*.whl $(CURDIR)/build/wheels/ || true
-	# Build source packages to wheels (skip atomiclong and mfusepy - handled separately)
+	# Build pip, setuptools, and wheel first as wheels (for pex bootstrapping)
+	for pkg in $(CURDIR)/debian/packages/pip-*.tar.gz $(CURDIR)/debian/packages/setuptools-*.tar.gz $(CURDIR)/debian/packages/wheel-*.tar.gz; do \
+		if [ -f "$$pkg" ]; then \
+			echo "Building wheel for $$pkg"; \
+			$(CURDIR)/build/venv/bin/pip wheel --no-deps --no-index --no-build-isolation \
+				--wheel-dir=$(CURDIR)/build/wheels "$$pkg" || true; \
+		fi; \
+	done
+	# Build other source packages to wheels (skip atomiclong and mfusepy - handled separately)
 	for pkg in $(CURDIR)/debian/packages/*.tar.gz; do \
 		case "$$pkg" in \
-			*atomiclong*|*mfusepy*) ;; \
+			*atomiclong*|*mfusepy*|*pip-*|*setuptools-*|*wheel-*) ;; \
 			*) \
 				if [ -f "$$pkg" ]; then \
 					echo "Building wheel for $$pkg"; \
@@ -69,25 +77,25 @@ override_dh_auto_build:
 		sed -i '/license-files/d' pyproject.toml && \
 		$(CURDIR)/build/venv/bin/pip wheel --no-deps --no-index --no-build-isolation --wheel-dir=$(CURDIR)/build/wheels . || \
 		$(CURDIR)/build/venv/bin/python3 -c "from setuptools import setup; setup(name='mfusepy', version='1.1.0', py_modules=['mfusepy'])" bdist_wheel --dist-dir=$(CURDIR)/build/wheels || true
-	# Create a requirements file for offline pex build
-	echo "atomiclong==0.1.1" > build/requirements.txt
-	echo "cffi==1.17.1" >> build/requirements.txt
-	echo "mfusepy==1.1.0" >> build/requirements.txt
-	echo "pycparser==2.22" >> build/requirements.txt
-	echo "pygit2==1.18.0" >> build/requirements.txt
-	echo "sentry-sdk==2.30.0" >> build/requirements.txt
-	echo "gitfs==1.0.0" >> build/requirements.txt
-	# Use pex with pre-built wheels only (completely offline)
+	# Use pex with all pre-built wheels (completely offline)
 	export HOME=$(CURDIR) && \
 		export PEX_IGNORE_RCFILES=1 && \
 		export PEX_PYTHON=/usr/bin/python3 && \
 		export PIP_NO_INDEX=1 && \
+		export PEX_RESOLVE_TAGS='cp312-cp312-linux_x86_64' && \
 		/usr/bin/pex \
 		--no-pypi \
 		--find-links=$(CURDIR)/build/wheels \
 		--no-build \
 		--disable-cache \
-		-r build/requirements.txt \
+		--interpreter-constraint='>=3.12,<3.13' \
+		atomiclong==0.1.1 \
+		cffi==1.17.1 \
+		mfusepy==1.1.0 \
+		pycparser==2.22 \
+		pygit2==1.18.0 \
+		sentry-sdk==2.30.0 \
+		gitfs==1.0.0 \
 		-m gitfs:mount \
 		-o build/gitfs
 
