@@ -62,16 +62,19 @@ override_dh_auto_build:
 	cd $(CURDIR)/debian/packages && tar xzf atomiclong-0.1.1.tar.gz && \
 		cd atomiclong-0.1.1 && \
 		$(CURDIR)/build/venv/bin/python3 setup.py bdist_wheel --dist-dir=$(CURDIR)/build/wheels || true
-	# Build mfusepy wheel (fix pyproject.toml first)
+	# Build mfusepy wheel (fix multiple pyproject.toml issues)
 	cd $(CURDIR)/debian/packages && tar xzf mfusepy-1.1.0.tar.gz && \
 		cd mfusepy-1.1.0 && \
 		sed -i 's/license = "ISC"/license = {text = "ISC"}/' pyproject.toml && \
-		$(CURDIR)/build/venv/bin/pip wheel --no-deps --no-index --no-build-isolation --wheel-dir=$(CURDIR)/build/wheels . || true
-	# Use pex 2.x syntax (no setuptools/wheel version flags)
+		sed -i '/license-files/d' pyproject.toml && \
+		$(CURDIR)/build/venv/bin/pip wheel --no-deps --no-index --no-build-isolation --wheel-dir=$(CURDIR)/build/wheels . || \
+		$(CURDIR)/build/venv/bin/python3 -c "from setuptools import setup; setup(name='mfusepy', version='1.1.0', py_modules=['mfusepy'])" bdist_wheel --dist-dir=$(CURDIR)/build/wheels || true
+	# Use pex with local pip/setuptools/wheel to avoid PyPI bootstrapping
 	export HOME=$(CURDIR) && \
-		/usr/bin/pex -v --disable-cache --no-pypi \
+		export PEX_IGNORE_RCFILES=1 && \
+		/usr/bin/pex -v --no-pypi \
+		--pip-version latest \
 		--no-build \
-		--pex-root=$(CURDIR)/build \
 		--find-links=$(CURDIR)/build/wheels \
 		gitfs atomiclong cffi mfusepy pycparser pygit2 sentry-sdk \
 		-m gitfs:mount \
