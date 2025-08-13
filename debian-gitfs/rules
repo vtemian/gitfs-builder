@@ -69,14 +69,25 @@ override_dh_auto_build:
 		sed -i '/license-files/d' pyproject.toml && \
 		$(CURDIR)/build/venv/bin/pip wheel --no-deps --no-index --no-build-isolation --wheel-dir=$(CURDIR)/build/wheels . || \
 		$(CURDIR)/build/venv/bin/python3 -c "from setuptools import setup; setup(name='mfusepy', version='1.1.0', py_modules=['mfusepy'])" bdist_wheel --dist-dir=$(CURDIR)/build/wheels || true
-	# Use pex with local pip/setuptools/wheel to avoid PyPI bootstrapping
+	# Create a requirements file for offline pex build
+	echo "atomiclong==0.1.1" > build/requirements.txt
+	echo "cffi==1.17.1" >> build/requirements.txt
+	echo "mfusepy==1.1.0" >> build/requirements.txt
+	echo "pycparser==2.22" >> build/requirements.txt
+	echo "pygit2==1.18.0" >> build/requirements.txt
+	echo "sentry-sdk==2.30.0" >> build/requirements.txt
+	echo "gitfs==1.0.0" >> build/requirements.txt
+	# Use pex with pre-built wheels only (completely offline)
 	export HOME=$(CURDIR) && \
 		export PEX_IGNORE_RCFILES=1 && \
-		/usr/bin/pex -v --no-pypi \
-		--pip-version latest \
-		--no-build \
+		export PEX_PYTHON=/usr/bin/python3 && \
+		export PIP_NO_INDEX=1 && \
+		/usr/bin/pex \
+		--no-pypi \
 		--find-links=$(CURDIR)/build/wheels \
-		gitfs atomiclong cffi mfusepy pycparser pygit2 sentry-sdk \
+		--no-build \
+		--disable-cache \
+		-r build/requirements.txt \
 		-m gitfs:mount \
 		-o build/gitfs
 
