@@ -78,32 +78,32 @@ override_dh_auto_build:
 		$(CURDIR)/build/venv/bin/pip wheel --no-deps --no-index --no-build-isolation --wheel-dir=$(CURDIR)/build/wheels . || \
 		$(CURDIR)/build/venv/bin/python3 -c "from setuptools import setup; setup(name='mfusepy', version='1.1.0', py_modules=['mfusepy'])" bdist_wheel --dist-dir=$(CURDIR)/build/wheels || true
 	# Use pex with all pre-built wheels (completely offline)
-	export HOME=$(CURDIR) && \
-		export PEX_IGNORE_RCFILES=1 && \
-		export PEX_PYTHON=/usr/bin/python3 && \
-		export PIP_NO_INDEX=1 && \
-		# Ensure pip bootstrap can find wheels offline
-		export PIP_FIND_LINKS="$(CURDIR)/build/wheels $(CURDIR)/debian/packages" && \
-		export PEX_RESOLVE_TAGS='cp312-cp312-linux_x86_64' && \
+	( \
+		export HOME=$(CURDIR); \
+		export PEX_IGNORE_RCFILES=1; \
+		export PEX_PYTHON=/usr/bin/python3; \
+		export PIP_NO_INDEX=1; \
+		export PIP_FIND_LINKS="$(CURDIR)/build/wheels $(CURDIR)/debian/packages"; \
+		export PEX_RESOLVE_TAGS='cp312-cp312-linux_x86_64'; \
 		/usr/bin/pex \
-		--no-pypi \
-		--find-links=$(CURDIR)/build/wheels \
-		--no-build \
-		--disable-cache \
-		# Use the tool versions we built above so bootstrapping stays offline
-		--pip-version 25.2 \
-		--setuptools-version 80.9.0 \
-		--wheel-version 0.45.1 \
-		--interpreter-constraint='>=3.12,<3.13' \
-		atomiclong==0.1.1 \
-		cffi==1.17.1 \
-		mfusepy==1.1.0 \
-		pycparser==2.22 \
-		pygit2==1.18.0 \
-		sentry-sdk==2.30.0 \
-		gitfs==1.0.0 \
-		-m gitfs:mount \
-		-o build/gitfs
+			--no-pypi \
+			--find-links=$(CURDIR)/build/wheels \
+			--no-build \
+			--disable-cache \
+			--pip-version 25.2 \
+			--setuptools-version 80.9.0 \
+			--wheel-version 0.45.1 \
+			--interpreter-constraint='>=3.12,<3.13' \
+			atomiclong==0.1.1 \
+			cffi==1.17.1 \
+			mfusepy==1.1.0 \
+			pycparser==2.22 \
+			pygit2==1.18.0 \
+			sentry-sdk==2.30.0 \
+			gitfs==1.0.0 \
+			-m gitfs:mount \
+			-o build/gitfs \
+	)
 
 override_dh_auto_install:
 	mkdir -p debian/gitfs/usr/bin
