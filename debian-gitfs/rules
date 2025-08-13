@@ -91,8 +91,6 @@ override_dh_auto_build:
 			--no-build \
 			--disable-cache \
 			--pip-version 25.2 \
-			--setuptools-version 80.9.0 \
-			--wheel-version 0.45.1 \
 			--interpreter-constraint='>=3.12,<3.13' \
 			atomiclong==0.1.1 \
 			cffi==1.17.1 \
