@@ -94,7 +94,7 @@ override_dh_auto_build:
 			--interpreter-constraint='>=3.12,<3.13' \
 			atomiclong==0.1.1 \
 			cffi==1.17.1 \
-			mfusepy==1.1.0 \
+			mfusepy==3.0.0 \
 			pycparser==2.22 \
 			pygit2==1.18.0 \
 			sentry-sdk==2.30.0 \
