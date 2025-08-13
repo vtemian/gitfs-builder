@@ -35,6 +35,16 @@ PACKAGES_DIR := $(GITFS_DIR)/debian/packages
 PREPARE_DEPS := $(addprefix prepare-, $(DEPENDENCIES))
 BUILD_DEPS := $(addprefix build-, $(DEPENDENCIES))
 
+# PEX bootstrap toolchain versions used internally by PEX when bootstrapping pip
+# Keep these in sync with debian-gitfs/rules expectations
+BOOTSTRAP_PIP_VERSION := 23.2
+BOOTSTRAP_SETUPTOOLS_VERSION := 68.0.0
+BOOTSTRAP_WHEEL_VERSION := 0.40.0
+
+BOOTSTRAP_PIP_URL := https://files.pythonhosted.org/packages/source/p/pip/pip-$(BOOTSTRAP_PIP_VERSION).tar.gz
+BOOTSTRAP_SETUPTOOLS_URL := https://files.pythonhosted.org/packages/source/s/setuptools/setuptools-$(BOOTSTRAP_SETUPTOOLS_VERSION).tar.gz
+BOOTSTRAP_WHEEL_URL := https://files.pythonhosted.org/packages/source/w/wheel/wheel-$(BOOTSTRAP_WHEEL_VERSION).tar.gz
+
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
 
@@ -64,6 +74,19 @@ get-gitfs:
 
 prepare-gitfs: get-gitfs
 	@cp -r debian-gitfs $(GITFS_DIR)/debian
+ifdef GITHUB_ACTIONS
+	# In CI, start from a clean packages dir to avoid stray files in source
+	@find $(GITFS_DIR)/debian/packages -type f ! -name '.gitkeep' -delete || true
+	@# Reset include-binaries so we only include what we fetch below
+	@printf '' > $(GITFS_DIR)/debian/source/include-binaries
+	# Ensure PEX bootstrap toolchain is present for offline bootstrapping
+	wget -q $(BOOTSTRAP_PIP_URL) -O $(PACKAGES_DIR)/pip-$(BOOTSTRAP_PIP_VERSION).tar.gz
+	echo debian/packages/pip-$(BOOTSTRAP_PIP_VERSION).tar.gz >> $(GITFS_DIR)/debian/source/include-binaries
+	wget -q $(BOOTSTRAP_SETUPTOOLS_URL) -O $(PACKAGES_DIR)/setuptools-$(BOOTSTRAP_SETUPTOOLS_VERSION).tar.gz
+	echo debian/packages/setuptools-$(BOOTSTRAP_SETUPTOOLS_VERSION).tar.gz >> $(GITFS_DIR)/debian/source/include-binaries
+	wget -q $(BOOTSTRAP_WHEEL_URL) -O $(PACKAGES_DIR)/wheel-$(BOOTSTRAP_WHEEL_VERSION).tar.gz
+	echo debian/packages/wheel-$(BOOTSTRAP_WHEEL_VERSION).tar.gz >> $(GITFS_DIR)/debian/source/include-binaries
+endif
 
 get-python-pex:
 	wget -q $(PYTHON_PEX_URL) -O $(BUILD_DIR)/python-pex_$(PYTHON_PEX_VERSION).orig.tar.gz
