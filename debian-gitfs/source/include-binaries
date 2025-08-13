@@ -10,6 +10,7 @@ debian/packages/pycparser-2.22.tar.gz
 debian/packages/pygit2-1.18.0.tar.gz
 debian/packages/sentry-sdk-2.30.0.tar.gz
 debian/packages/urllib3-2.0.7.tar.gz
+debian/packages/certifi-2023.11.17.tar.gz
 debian/packages/pip-23.2.tar.gz
 debian/packages/setuptools-68.0.0.tar.gz
 debian/packages/wheel-0.40.0.tar.gz

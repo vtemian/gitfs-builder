@@ -32,6 +32,7 @@ wget -q "$(get_var PIP_URL)" -O "debian-gitfs/packages/pip-$(get_var PIP_VERSION
 wget -q "$(get_var SETUPTOOLS_URL)" -O "debian-gitfs/packages/setuptools-$(get_var SETUPTOOLS_VERSION).tar.gz"
 wget -q "$(get_var WHEEL_URL)" -O "debian-gitfs/packages/wheel-$(get_var WHEEL_VERSION).tar.gz"
 wget -q "$(get_var FLIT_CORE_URL)" -O "debian-gitfs/packages/flit-core-$(get_var FLIT_CORE_VERSION).tar.gz"
+wget -q "$(get_var CERTIFI_URL)" -O "debian-gitfs/packages/certifi-$(get_var CERTIFI_VERSION).tar.gz"
 
 echo "All packages downloaded successfully!"
 ls -la debian-gitfs/packages/
