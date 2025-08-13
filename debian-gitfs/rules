@@ -71,8 +71,8 @@ override_dh_auto_build:
 		cd atomiclong-0.1.1 && \
 		$(CURDIR)/build/venv/bin/python3 setup.py bdist_wheel --dist-dir=$(CURDIR)/build/wheels || true
 	# Build mfusepy wheel (fix multiple pyproject.toml issues)
-	cd $(CURDIR)/debian/packages && tar xzf mfusepy-1.1.0.tar.gz && \
-		cd mfusepy-1.1.0 && \
+	cd $(CURDIR)/debian/packages && tar xzf mfusepy-3.0.0.tar.gz && \
+		cd mfusepy-3.0.0 && \
 		sed -i 's/license = "ISC"/license = {text = "ISC"}/' pyproject.toml && \
 		sed -i '/license-files/d' pyproject.toml && \
 		$(CURDIR)/build/venv/bin/pip wheel --no-deps --no-index --no-build-isolation --wheel-dir=$(CURDIR)/build/wheels . || \

@@ -10,7 +10,7 @@ LIBGIT2_VERSION := 1.9.0
 PACKAGES := atomiclong cffi mfusepy pycparser pygit2 sentry-sdk urllib3 certifi pip setuptools wheel flit-core hatchling packaging pathspec pluggy trove-classifiers
 ATOMICLONG_VERSION := 0.1.1
 CFFI_VERSION := 1.17.1
-MFUSEPY_VERSION := 1.1.0
+MFUSEPY_VERSION := 3.0.0
 PYCPARSER_VERSION := 2.22
 PYGIT2_VERSION := 1.18.0
 SENTRY_SDK_VERSION := 2.30.0
@@ -32,7 +32,7 @@ PYTHON_PEX_URL := https://github.com/pantsbuild/pex/archive/v$(PYTHON_PEX_VERSIO
 
 ATOMICLONG_URL := https://pypi.python.org/packages/source/a/atomiclong/atomiclong-$(ATOMICLONG_VERSION).tar.gz
 CFFI_URL := https://files.pythonhosted.org/packages/fc/97/c783634659c2920c3fc70419e3af40972dbaf758daa229a7d6ea6135c90d/cffi-$(CFFI_VERSION).tar.gz
-MFUSEPY_URL := https://files.pythonhosted.org/packages/8b/37/b29c414d76e8d709b6e28b1ee18e6d4c6a605abca79c86e549aab9a6eea9/mfusepy-$(MFUSEPY_VERSION).tar.gz
+MFUSEPY_URL := https://files.pythonhosted.org/packages/source/m/mfusepy/mfusepy-$(MFUSEPY_VERSION).tar.gz
 PYCPARSER_URL := https://files.pythonhosted.org/packages/1d/b2/31537cf4b1ca988837256c910a668b553fceb8f069bedc4b1c826024b52c/pycparser-$(PYCPARSER_VERSION).tar.gz
 PYGIT2_URL := https://github.com/libgit2/pygit2/archive/refs/tags/v$(PYGIT2_VERSION).tar.gz
 SENTRY_SDK_URL := https://files.pythonhosted.org/packages/04/4c/af31e0201b48469786ddeb1bf6fd3dfa3a291cc613a0fe6a60163a7535f9/sentry_sdk-$(SENTRY_SDK_VERSION).tar.gz
