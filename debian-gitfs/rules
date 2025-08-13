@@ -82,12 +82,18 @@ override_dh_auto_build:
 		export PEX_IGNORE_RCFILES=1 && \
 		export PEX_PYTHON=/usr/bin/python3 && \
 		export PIP_NO_INDEX=1 && \
+		# Ensure pip bootstrap can find wheels offline
+		export PIP_FIND_LINKS="$(CURDIR)/build/wheels $(CURDIR)/debian/packages" && \
 		export PEX_RESOLVE_TAGS='cp312-cp312-linux_x86_64' && \
 		/usr/bin/pex \
 		--no-pypi \
 		--find-links=$(CURDIR)/build/wheels \
 		--no-build \
 		--disable-cache \
+		# Use the tool versions we built above so bootstrapping stays offline
+		--pip-version 25.2 \
+		--setuptools-version 80.9.0 \
+		--wheel-version 0.45.1 \
 		--interpreter-constraint='>=3.12,<3.13' \
 		atomiclong==0.1.1 \
 		cffi==1.17.1 \
