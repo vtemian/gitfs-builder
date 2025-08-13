@@ -5,7 +5,8 @@ include VERSIONS
 ifdef GITHUB_ACTIONS
 	TARGET ?= $(CURDIR)/build
 else
-	TARGET ?= /target/build
+	# For local development, use current directory
+	TARGET ?= $(CURDIR)/build
 endif
 
 ifdef GITHUB_REF
